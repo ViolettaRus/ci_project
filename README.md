@@ -1,0 +1,1 @@
+![Test Status](https://github.com/ViolettaRus/ci_project/actions/workflows/ci.yml/badge.svg)
