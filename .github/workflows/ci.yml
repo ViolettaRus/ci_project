@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -23,30 +23,27 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flake8
+          pip install -r requirements.txt flake8 pytest
           
       - name: Run linter
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
           
-      - name: Run tests
+      - name: Run tests (with forced failure)
         run: |
-          pytest -m "fail_ci"  # Запуск только "падающего" теста
-          pytest -m "not fail_ci"  # Остальные тесты (опционально)
+          pytest -v -m "fail_ci"  # Намеренно падающий тест
+          # pytest -m "not fail_ci"  # Раскомментировать для реальных тестов
           
-      - name: Notify on failure
+      - name: Notify Telegram on failure
         if: failure()
         uses: appleboy/telegram-action@master
         with:
-          to: Vi_Ci_bot
-          token: 7609669258:AAFcDIXd8Pzc79iEx6KvLwRpxw06cpQZXz0
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            🚨 Tests failed!
-            Repository: ${{ github.repository }}
-            Workflow: ${{ github.workflow }}
-            Commit: ${{ github.sha }}
-            Python: ${{ matrix.python-version }}
-            OS: ${{ matrix.os }}
-            View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            🚨 **Tests Failed!**
+            ▸ Repository: [`${{ github.repository }}`](https://github.com/${{ github.repository }})
+            ▸ Python: `${{ matrix.python-version }}` (${{ matrix.os }})
+            ▸ Commit: [${GITHUB_SHA:0:7}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            ▸ Logs: [View in GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})

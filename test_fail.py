@@ -1,5 +1,5 @@
 import pytest
 
+@pytest.mark.fail_ci
 def test_always_fail():
-    """Этот тест всегда падает, чтобы проверить CI-уведомления."""
-    assert False, "Этот тест упал намеренно (для проверки CI)"
+    assert False, "Этот тест падает намеренно (для проверки Telegram)"
