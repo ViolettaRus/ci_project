@@ -32,8 +32,7 @@ jobs:
           
       - name: Run tests (with forced failure)
         run: |
-          pytest -v -m "fail_ci"  # Намеренно падающий тест
-          # pytest -m "not fail_ci"  # Раскомментировать для реальных тестов
+          pytest
           
       - name: Notify Telegram on failure
         if: failure()
